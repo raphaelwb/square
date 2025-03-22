@@ -15,26 +15,26 @@ const statusDisplay = document.getElementById('status');
 function createRoom() {
     peer = new Peer();
     peer.on('open', (id) => {
-        roomIdDisplay.textContent = `ID da Sala: ${id}`;
-        statusDisplay.textContent = 'Aguardando Espectador...';
+        roomIdDisplay.textContent = `Room ID: ${id}`;
+        statusDisplay.textContent = 'Waiting for Interventor...';
         isHost = true;
         window.isHost = true;
         gameStarted = true;
         window.gameStarted = true;
-        console.log(`[Host] Sala criada com ID: ${id}`);
+        console.log(`[Host] Room created with ID: ${id}`);
     });
 
     peer.on('connection', (conn) => {
         connection = conn;
         window.connection = conn;
-        statusDisplay.textContent = 'Jogador conectado!';
-        console.log('[Host] Espectador conectado!');
+        statusDisplay.textContent = 'Interventor connected!';
+        console.log('[Host] Interventor connected!');
         setupConnection(conn);
     });
 
     peer.on('error', (err) => {
-        console.error('[Host] Erro na conexão:', err);
-        statusDisplay.textContent = 'Erro ao criar sala. Tente novamente.';
+        console.error('[Host] Connection error:', err);
+        statusDisplay.textContent = 'Error creating room. Please try again.';
     });
 }
 
@@ -42,8 +42,8 @@ function createRoom() {
 function joinRoom() {
     const hostId = peerIdInput.value;
     if (!hostId) {
-        statusDisplay.textContent = 'Digite um ID válido!';
-        console.log('[Espectador] ID da sala não fornecido');
+        statusDisplay.textContent = 'Enter a valid ID!';
+        console.log('[Interventor] Room ID not provided');
         return;
     }
 
@@ -51,8 +51,8 @@ function joinRoom() {
     peer.on('open', () => {
         connection = peer.connect(hostId);
         window.connection = connection;
-        statusDisplay.textContent = 'Conectando...';
-        console.log(`[Espectador] Tentando conectar à sala: ${hostId}`);
+        statusDisplay.textContent = 'Connecting...';
+        console.log(`[Interventor] Trying to connect to room: ${hostId}`);
         isHost = false;
         window.isHost = false;
         gameStarted = true;
@@ -61,8 +61,8 @@ function joinRoom() {
     });
 
     peer.on('error', (err) => {
-        console.error('[Espectador] Erro na conexão:', err);
-        statusDisplay.textContent = 'Erro ao conectar. Verifique o ID e tente novamente.';
+        console.error('[Interventor] Connection error:', err);
+        statusDisplay.textContent = 'Connection error. Check the ID and try again.';
     });
 }
 
@@ -70,11 +70,11 @@ function joinRoom() {
 function setupConnection(conn) {
     conn.on('open', () => {
         if (isHost) {
-            statusDisplay.textContent = 'Jogador conectado!';
-            console.log('[Host] Conexão estabelecida com o espectador');
+            statusDisplay.textContent = 'Interventor connected!';
+            console.log('[Host] Connection established with interventor');
         } else {
-            statusDisplay.textContent = 'Conectado como espectador!';
-            console.log('[Espectador] Conexão estabelecida com o host');
+            statusDisplay.textContent = 'Connected as interventor!';
+            console.log('[Interventor] Connection established with host');
         }
     });
 
@@ -101,7 +101,7 @@ function setupConnection(conn) {
                 window.score = data.score;
                 window.platforms = data.platforms;
                 
-                console.log('[Espectador] Estado do jogo atualizado', {
+                console.log('[Interventor] Game state updated', {
                     player: window.player,
                     cameraY: window.cameraY,
                     score: window.score
@@ -111,14 +111,14 @@ function setupConnection(conn) {
     });
 
     conn.on('close', () => {
-        statusDisplay.textContent = 'Conexão perdida!';
-        console.log(isHost ? '[Host] Espectador desconectado' : '[Espectador] Conexão com o host perdida');
+        statusDisplay.textContent = 'Connection lost!';
+        console.log(isHost ? '[Host] Interventor disconnected' : '[Interventor] Connection with host lost');
         resetGame();
     });
 
     conn.on('error', (err) => {
-        console.error(isHost ? '[Host]' : '[Espectador]', 'Erro na conexão:', err);
-        statusDisplay.textContent = 'Erro na conexão. Tente novamente.';
+        console.error(isHost ? '[Host]' : '[Interventor]', 'Connection error:', err);
+        statusDisplay.textContent = 'Connection error. Please try again.';
     });
 }
 
@@ -139,7 +139,7 @@ function resetMultiplayer() {
     }
     isHost = false;
     window.isHost = false;
-    console.log(isHost ? '[Host]' : '[Espectador]', 'Estado do multiplayer resetado');
+    console.log(isHost ? '[Host]' : '[Interventor]', 'Multiplayer state reset');
 }
 
 // Event Listeners

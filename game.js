@@ -111,9 +111,9 @@ function gameLoop() {
         ctx.fillStyle = '#000';
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Crie uma sala para começar', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Create a room to start', canvas.width / 2, canvas.height / 2);
         ctx.font = '20px Arial';
-        ctx.fillText('ou entre em uma sala existente', canvas.width / 2, canvas.height / 2 + 40);
+        ctx.fillText('or join an existing room', canvas.width / 2, canvas.height / 2 + 40);
         ctx.textAlign = 'left';
         requestAnimationFrame(gameLoop);
         return;
