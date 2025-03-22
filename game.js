@@ -63,7 +63,7 @@ async function loadLevel() {
         // Constants for platform spacing
         const PLATFORM_WIDTH = 40;
         const PLATFORM_HEIGHT = 20;
-        const VERTICAL_SPACING = 150; // Space between platforms vertically
+        const VERTICAL_SPACING = 120; // Space between platforms vertically
         
         // Find player starting position and create platforms
         for (let y = 0; y < lines.length; y++) {
@@ -221,19 +221,19 @@ function gameLoop() {
     const statusWidth = 150;
     const statusHeight = 80;
     const padding = 10;
-    ctx.fillRect(canvas.width - statusWidth - padding, padding, statusWidth, statusHeight);
+    ctx.fillRect(canvas.width - statusWidth - padding + 10, padding, statusWidth, statusHeight);
     
     // Draw score
     ctx.fillStyle = '#000';
     ctx.font = '20px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText(`Score: ${window.score}`, canvas.width - statusWidth - padding + 10, 30 + padding);
+    ctx.fillText(`Score: ${window.score}`, canvas.width - statusWidth - padding + 20, 30 + padding);
     
     // Draw multiplayer status
     if (isHost) {
-        ctx.fillText('Controller', canvas.width - statusWidth - padding + 10, 60 + padding);
+        ctx.fillText('Controller', canvas.width - statusWidth - padding + 20, 60 + padding);
     } else {
-        ctx.fillText('Interventor', canvas.width - statusWidth - padding + 10, 60 + padding);
+        ctx.fillText('Interventor', canvas.width - statusWidth - padding + 20, 60 + padding);
     }
     
     requestAnimationFrame(gameLoop);
