@@ -26,3 +26,10 @@ To run the game locally:
 1. Download the repository.
 2. Run `python3 -m http.server 8000` from the command line.
 3. Open `http://127.0.0.1:8000/` in your browser.
+
+### Corrections and features that have been implemented since the last update.
+1. Added version number.
+2. Translated texts to English.
+3. Improved the score display.
+4. Added barriers.
+

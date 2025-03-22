@@ -5,6 +5,16 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 600;
 
+// Add version text below canvas
+const versionText = document.createElement('div');
+versionText.style.textAlign = 'center';
+versionText.style.fontFamily = 'Arial';
+versionText.style.fontSize = '12px';
+versionText.style.color = '#FFFFFF';
+versionText.style.marginTop = '5px';
+versionText.textContent = 'Versão Beta 1.0.0';
+canvas.parentNode.appendChild(versionText);
+
 // Game properties
 window.player = {
     x: 50,
@@ -13,7 +23,7 @@ window.player = {
     height: 30,
     velocityY: 0,
     isJumping: false,
-    jumpForce: -15,
+    jumpForce: -12,
     gravity: 0.8,
     speed: 5
 };
@@ -169,9 +179,24 @@ function gameLoop() {
                 window.player.y + window.player.height < platform.y + platform.height &&
                 window.player.x + window.player.width > platform.x &&
                 window.player.x < platform.x + platform.width) {
-                window.player.y = platform.y - window.player.height;
-                window.player.velocityY = 0;
-                window.player.isJumping = false;
+                
+                if (platform.isBarrier) {
+                    // Calculate collision direction
+                    const fromLeft = window.player.x + window.player.width - window.player.speed <= platform.x;
+                    const fromRight = window.player.x >= platform.x + platform.width - window.player.speed;
+                    
+                    // Repel player backwards without stopping vertical movement
+                    if (fromLeft) {
+                        window.player.x = platform.x - window.player.width - 10; // Repel 10 pixels to the left
+                    } else if (fromRight) {
+                        window.player.x = platform.x + platform.width + 10; // Repel 10 pixels to the right
+                    }
+                } else {
+                    // Normal platform collision
+                    window.player.y = platform.y - window.player.height;
+                    window.player.velocityY = 0;
+                    window.player.isJumping = false;
+                }
                 break;
             }
         }
