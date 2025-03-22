@@ -18,3 +18,11 @@ Square is a platform game based on the concept of **Vibe Coding**.
 - ⚠️ The platform is appearing in the middle of the environment.
 - 🎯 Add a target platform to complete the game.
 - 🚧 Allow the Interventor to add challenges.
+
+## 🚀 Getting Started
+
+### Local Development
+To run the game locally:
+1. Download the repository.
+2. Run `python3 -m http.server 8000` from the command line.
+3. Open `http://127.0.0.1:8000/` in your browser.
