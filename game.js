@@ -181,16 +181,24 @@ function gameLoop() {
     ctx.fillStyle = '#00f';
     ctx.fillRect(window.player.x, window.player.y - window.cameraY, window.player.width, window.player.height);
     
+    // Draw score and status in top right corner
+    ctx.fillStyle = 'rgba(255, 255, 0, 0.3)'; // Transparent yellow background
+    const statusWidth = 150;
+    const statusHeight = 80;
+    const padding = 10;
+    ctx.fillRect(canvas.width - statusWidth - padding, padding, statusWidth, statusHeight);
+    
     // Draw score
     ctx.fillStyle = '#000';
     ctx.font = '20px Arial';
-    ctx.fillText(`Score: ${window.score}`, 10, 30);
+    ctx.textAlign = 'left';
+    ctx.fillText(`Score: ${window.score}`, canvas.width - statusWidth - padding + 10, 30 + padding);
     
     // Draw multiplayer status
     if (isHost) {
-        ctx.fillText('Host', 10, 60);
+        ctx.fillText('Controller', canvas.width - statusWidth - padding + 10, 60 + padding);
     } else {
-        ctx.fillText('Spectator', 10, 60);
+        ctx.fillText('Interventor', canvas.width - statusWidth - padding + 10, 60 + padding);
     }
     
     requestAnimationFrame(gameLoop);
