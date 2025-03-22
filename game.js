@@ -74,6 +74,21 @@ async function loadLevel() {
                 window.player.y = y * VERTICAL_SPACING; // Use vertical spacing for player position
                 // Ensure player starts on a platform
                 window.player.y -= window.player.height;
+                
+                // Add platform below player if there isn't one
+                const platformBelow = window.platforms.some(p => 
+                    p.x === playerX * PLATFORM_WIDTH && 
+                    p.y === y * VERTICAL_SPACING
+                );
+                
+                if (!platformBelow) {
+                    window.platforms.push({
+                        x: playerX * PLATFORM_WIDTH,
+                        y: y * VERTICAL_SPACING,
+                        width: PLATFORM_WIDTH,
+                        height: PLATFORM_HEIGHT
+                    });
+                }
             }
             
             // Create platforms from ASCII art
