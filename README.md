@@ -2,7 +2,7 @@
 
 Square is a platform game based on the concept of **Vibe Coding**.
 
-🔗 **Learn more about Vibe Coding:** [Vibe Code - Wikipedia](https://en.wikipedia.org/wiki/Vibe_coding)
+🔗 **Learn more about Vibe Coding:** [Vibe Coding - Wikipedia](https://en.wikipedia.org/wiki/Vibe_coding)
 
 🔗 **Play now:** [raphaelwb.github.io/square](https://raphaelwb.github.io/square/)
 
