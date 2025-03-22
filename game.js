@@ -91,7 +91,7 @@ async function loadLevel() {
                 }
             }
             
-            // Create platforms from ASCII art
+            // Create platforms and barriers from ASCII art
             for (let x = 0; x < line.length; x++) {
                 if (line[x] === '_') {
                     window.platforms.push({
@@ -99,6 +99,22 @@ async function loadLevel() {
                         y: y * VERTICAL_SPACING, // Use vertical spacing for platform position
                         width: PLATFORM_WIDTH,
                         height: PLATFORM_HEIGHT
+                    });
+                } else if (line[x] === 'I') {
+                    window.platforms.push({
+                        x: x * PLATFORM_WIDTH,
+                        y: y * VERTICAL_SPACING - (PLATFORM_HEIGHT * 3), // Move barrier up
+                        width: PLATFORM_WIDTH,
+                        height: PLATFORM_HEIGHT * 4, // Make barriers 4x taller
+                        isBarrier: true // Mark as barrier
+                    });
+                } else if (line[x] === '|') {
+                    window.platforms.push({
+                        x: x * PLATFORM_WIDTH,
+                        y: y * VERTICAL_SPACING - (PLATFORM_HEIGHT * 6), // Move barrier up
+                        width: PLATFORM_WIDTH,
+                        height: PLATFORM_HEIGHT * 7, // Make barriers 7x taller
+                        isBarrier: true // Mark as barrier
                     });
                 }
             }
@@ -187,8 +203,12 @@ function gameLoop() {
     }
     
     // Draw platforms
-    ctx.fillStyle = '#666';
     for (let platform of window.platforms) {
+        if (platform.isBarrier) {
+            ctx.fillStyle = '#f00'; // Red color for barriers
+        } else {
+            ctx.fillStyle = '#666'; // Gray color for regular platforms
+        }
         ctx.fillRect(platform.x, platform.y - window.cameraY, platform.width, platform.height);
     }
     
