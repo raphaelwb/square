@@ -1,70 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Square Platformer</title>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <title>Rolling Ball Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
             background-color: #333;
-            color: white;
-            font-family: Arial, sans-serif;
         }
         canvas {
-            border: 2px solid #fff;
             background-color: #87CEEB;
-            margin-top: 20px;
+            border: 2px solid white;
+            width: 800px;
+            height: 600px;
         }
-        #connectionUI {
-            margin-top: 20px;
-            text-align: center;
-        }
-        input, button {
-            margin: 5px;
-            padding: 8px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        #joystick-area {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 150px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            touch-action: none;
             cursor: pointer;
-            border-radius: 4px;
         }
-        button:hover {
-            background-color: #45a049;
+        #joystick {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            touch-action: none;
+            pointer-events: none;
         }
-        #status {
-            margin-top: 10px;
-            font-size: 18px;
+        @media (max-width: 800px) {
+            canvas {
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="connectionUI">
-        <div id="hostControls">
-            <button id="createRoom">Create Room</button>
-            <div id="roomId"></div>
-        </div>
-        <div id="joinControls">
-            <input type="text" id="peerId" placeholder="Enter room ID">
-            <button id="joinRoom">Join Room</button>
-        </div>
-        <div id="status"></div>
-    </div>
     <canvas id="gameCanvas"></canvas>
-    <script src="multiplayer.js?v=1.0.0"></script>
-    <script src="game.js?v=1.0.0"></script>
-    
+    <div id="joystick-area">
+        <div id="joystick"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="game.js"></script>
 </body>
 </html> 
