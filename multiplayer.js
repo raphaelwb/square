@@ -16,7 +16,7 @@ const shareWhatsAppBtn = document.getElementById('shareWhatsApp');
 // Share room code via WhatsApp
 function shareViaWhatsApp(roomId) {
     const gameUrl = window.location.href.split('?')[0]; // Get base URL without parameters
-    const message = `Venha jogar comigo! Use o código da sala: ${roomId}\n\nAcesse: ${gameUrl}`;
+    const message = `Come play with me! Use room code: ${roomId}\n\nAccess: ${gameUrl}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
@@ -53,7 +53,7 @@ function addLog(message, type = 'system') {
 
 // Create a new room
 function createRoom() {
-    addLog('Iniciando criação da sala...', 'system');
+    addLog('Starting room creation...', 'system');
     
     // Disable buttons temporarily to prevent double-clicks
     createRoomBtn.disabled = true;
@@ -62,13 +62,13 @@ function createRoom() {
     
     peer = new Peer();
     peer.on('open', (id) => {
-        roomIdDisplay.textContent = `Código da Sala: ${id}`;
-        statusDisplay.textContent = 'Aguardando Interventor...';
+        roomIdDisplay.textContent = `Room Code: ${id}`;
+        statusDisplay.textContent = 'Waiting for Player...';
         isHost = true;
         window.isHost = true;
         gameStarted = true;
         window.gameStarted = true;
-        addLog(`Sala criada com ID: ${id}`, 'host');
+        addLog(`Room created with ID: ${id}`, 'host');
         
         // Show share button and setup click handler
         shareWhatsAppBtn.style.display = 'flex';
@@ -81,15 +81,15 @@ function createRoom() {
     peer.on('connection', (conn) => {
         connection = conn;
         window.connection = conn;
-        statusDisplay.textContent = 'Interventor conectado!';
-        addLog('Interventor conectado à sala', 'host');
+        statusDisplay.textContent = 'Player connected!';
+        addLog('Player connected to room', 'host');
         setupConnection(conn);
     });
 
     peer.on('error', (err) => {
         console.error('[Host] Connection error:', err);
-        statusDisplay.textContent = 'Erro ao criar sala. Tente novamente.';
-        addLog(`Erro ao criar sala: ${err.message}`, 'system');
+        statusDisplay.textContent = 'Error creating room. Please try again.';
+        addLog(`Error creating room: ${err.message}`, 'system');
         
         // Re-enable buttons on error
         createRoomBtn.disabled = false;
@@ -102,8 +102,8 @@ function createRoom() {
 function joinRoom() {
     const hostId = peerIdInput.value;
     if (!hostId) {
-        statusDisplay.textContent = 'Digite um ID válido!';
-        addLog('ID da sala não fornecido', 'system');
+        statusDisplay.textContent = 'Enter a valid room code!';
+        addLog('Room code not provided', 'system');
         return;
     }
 
@@ -112,14 +112,14 @@ function joinRoom() {
     joinRoomBtn.disabled = true;
     shareWhatsAppBtn.style.display = 'none';
     
-    addLog('Tentando conectar...', 'system');
+    addLog('Attempting to connect...', 'system');
 
     peer = new Peer();
     peer.on('open', () => {
         connection = peer.connect(hostId);
         window.connection = connection;
-        statusDisplay.textContent = 'Conectando...';
-        addLog(`Tentando conectar à sala: ${hostId}`, 'interventor');
+        statusDisplay.textContent = 'Connecting...';
+        addLog(`Trying to connect to room: ${hostId}`, 'interventor');
         isHost = false;
         window.isHost = false;
         gameStarted = true;
@@ -128,9 +128,9 @@ function joinRoom() {
     });
 
     peer.on('error', (err) => {
-        console.error('[Interventor] Connection error:', err);
-        statusDisplay.textContent = 'Erro de conexão. Verifique o ID e tente novamente.';
-        addLog(`Erro ao conectar: ${err.message}`, 'system');
+        console.error('[Player] Connection error:', err);
+        statusDisplay.textContent = 'Connection error. Check the code and try again.';
+        addLog(`Connection error: ${err.message}`, 'system');
         
         // Re-enable buttons on error
         createRoomBtn.disabled = false;
@@ -142,11 +142,11 @@ function joinRoom() {
 function setupConnection(conn) {
     conn.on('open', () => {
         if (isHost) {
-            statusDisplay.textContent = 'Interventor conectado!';
-            addLog('Conexão estabelecida com o Interventor', 'host');
+            statusDisplay.textContent = 'Player connected!';
+            addLog('Connection established with player', 'host');
         } else {
-            statusDisplay.textContent = 'Connected as interventor!';
-            addLog('Conexão estabelecida com o Host', 'interventor');
+            statusDisplay.textContent = 'Connected to game!';
+            addLog('Connection established with host', 'interventor');
         }
     });
 
@@ -182,7 +182,7 @@ function setupConnection(conn) {
                     data.player.velocityY * data.player.velocityY
                 );
                 if (speed > 5) {
-                    addLog(`Movimento rápido detectado! Velocidade: ${speed.toFixed(2)}`, 'interventor');
+                    addLog(`Fast movement detected! Speed: ${speed.toFixed(2)}`, 'interventor');
                 }
             }
         }
@@ -190,14 +190,14 @@ function setupConnection(conn) {
 
     conn.on('close', () => {
         statusDisplay.textContent = 'Connection lost!';
-        addLog(isHost ? 'Interventor desconectado' : 'Conexão com o host perdida', 'system');
+        addLog(isHost ? 'Player disconnected' : 'Connection with host lost', 'system');
         resetGame();
     });
 
     conn.on('error', (err) => {
-        console.error(isHost ? '[Host]' : '[Interventor]', 'Connection error:', err);
+        console.error(isHost ? '[Host]' : '[Player]', 'Connection error:', err);
         statusDisplay.textContent = 'Connection error. Please try again.';
-        addLog(`Erro de conexão: ${err.message}`, 'system');
+        addLog(`Connection error: ${err.message}`, 'system');
     });
 }
 
@@ -218,7 +218,7 @@ function resetMultiplayer() {
     }
     isHost = false;
     window.isHost = false;
-    addLog('Estado do multiplayer resetado', 'system');
+    addLog('Multiplayer state reset', 'system');
 }
 
 // Event Listeners
@@ -235,4 +235,4 @@ window.connection = connection;
 window.peer = peer;
 
 // Initialize with a welcome message
-addLog('Bem-vindo ao jogo! Crie uma sala ou entre em uma existente.', 'system'); 
+addLog('Welcome to the game! Create a room or join an existing one.', 'system'); 
