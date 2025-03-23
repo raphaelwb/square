@@ -1,6 +1,6 @@
-# Circle
+# Rolling Circle
 
-Circle is a platform game based on the concept of **Vibe Coding**.
+Rolling Circle is a platform game based on the concept of **Vibe Coding**.
 
 🔗 **Learn more about Vibe Coding:** [Vibe Coding - Wikipedia](https://en.wikipedia.org/wiki/Vibe_coding)
 
@@ -24,13 +24,12 @@ error is in the function that controls the player.
 - 🏠 Game rooms can be created.
 - 👀 The Interventor can follow the game's progress.
 - It works on mobile, but the browser must be set to desktop mode.
+- Removed joistick and included control buttons
 
 ### 🔧 To Do
-- 🏗️ Game environment should be based on a `level.txt` file.
+- 🏗️ Game environment should be based on a `level?.txt` file.
 - 🎯 Add a target platform to complete the game.
 - 🚧 Allow the Interventor to add challenges.
-- ⚠️ Add jump control to joystick.
-- ⚠️ fix - Jump only works once in multiplayer mode.
 
 ## 🚀 Getting Started
 
@@ -52,3 +51,4 @@ To run the game locally:
 - The game was recreated using the **Matter.js** library for physics.
 - Collision issues were resolved, resulting in smoother and more engaging gameplay.
 - The jumping square was replaced with a **rolling circle**, better utilizing the gravity features of the library.
+- I am using cursor IDE, after finishing all free calls, I switched to claude-3-opus

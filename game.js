@@ -83,116 +83,59 @@ const MAX_VELOCITY = 5;
 // Key states
 const keys = {
     left: false,
-    right: false
+    right: false,
+    space: false
 };
 
-// Joystick state
-const joystick = {
-    active: false,
-    x: 0
-};
+// Button event listeners
+const leftButton = document.getElementById('left-button');
+const rightButton = document.getElementById('right-button');
+const jumpButton = document.getElementById('jump-button');
 
-// Touch controls setup
-const joystickArea = document.getElementById('joystick-area');
-const joystickElement = document.getElementById('joystick');
-const joystickBounds = joystickArea.getBoundingClientRect();
-const joystickCenter = {
-    x: joystickBounds.left + joystickBounds.width / 2,
-    y: joystickBounds.top + joystickBounds.height / 2
-};
-const maxJoystickDistance = joystickBounds.width / 2 - joystickElement.offsetWidth / 2;
-
-// Handle input events (both touch and mouse)
-function handleStart(e) {
-    if (!window.gameStarted || window.isHost) {
-        e.preventDefault();
-        const point = e.touches ? e.touches[0] : e;
-        if (point.target === joystickArea || point.target === joystickElement) {
-            joystick.active = true;
-            updateJoystickPosition(point);
-        }
-    }
-}
-
-function handleMove(e) {
-    if (!window.gameStarted || window.isHost) {
-        e.preventDefault();
-        if (joystick.active) {
-            const point = e.touches ? e.touches[0] : e;
-            updateJoystickPosition(point);
-        }
-    }
-}
-
-function handleEnd(e) {
-    if (!window.gameStarted || window.isHost) {
-        e.preventDefault();
-        joystick.active = false;
-        joystickElement.style.transform = 'translate(-50%, -50%)';
-        joystick.x = 0;
-    }
-}
-
-function updateJoystickPosition(point) {
-    const joystickRect = joystickArea.getBoundingClientRect();
-    const dx = point.clientX - (joystickRect.left + joystickRect.width / 2);
-    const distance = Math.min(Math.abs(dx), maxJoystickDistance);
-    const moveX = Math.sign(dx) * distance;
-
-    joystickElement.style.transform = `translate(calc(-50% + ${moveX}px), -50%)`;
-    joystick.x = moveX / maxJoystickDistance;
-}
-
-// Add touch event listeners
-joystickArea.addEventListener('touchstart', handleStart, { passive: false });
-document.addEventListener('touchmove', handleMove, { passive: false });
-document.addEventListener('touchend', handleEnd, { passive: false });
-document.addEventListener('touchcancel', handleEnd, { passive: false });
-
-// Add mouse event listeners
-joystickArea.addEventListener('mousedown', handleStart);
-document.addEventListener('mousemove', handleMove);
-document.addEventListener('mouseup', handleEnd);
-
-// Keyboard event listeners - Only allow input if host or game not started
-document.addEventListener('keydown', (e) => {
-    if (!window.gameStarted || window.isHost) {
-        switch(e.key) {
-            case 'ArrowLeft':
-            case 'a':
-                keys.left = true;
-                break;
-            case 'ArrowRight':
-            case 'd':
-                keys.right = true;
-                break;
-            case ' ':
-                keys.space = true;  // Definindo que a tecla space foi pressionada
-                break;
-        }
-    }
+leftButton.addEventListener('mousedown', () => {
+    keys.left = true;
+});
+leftButton.addEventListener('mouseup', () => {
+    keys.left = false;
+});
+leftButton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keys.left = true;
+});
+leftButton.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    keys.left = false;
 });
 
-document.addEventListener('keyup', (e) => {
-    if (!window.gameStarted || window.isHost) {
-        switch(e.key) {
-            case 'ArrowLeft':
-            case 'a':
-                keys.left = false;
-                break;
-            case 'ArrowRight':
-            case 'd':
-                keys.right = false;
-                break;
-            case ' ':
-                keys.space = false;  // Definindo que a tecla space foi liberada
-                break;
-        }
-    }
+rightButton.addEventListener('mousedown', () => {
+    keys.right = true;
+});
+rightButton.addEventListener('mouseup', () => {
+    keys.right = false;
+});
+rightButton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keys.right = true;
+});
+rightButton.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    keys.right = false;
 });
 
-
-// ... existing code ...
+jumpButton.addEventListener('mousedown', () => {
+    keys.space = true;
+});
+jumpButton.addEventListener('mouseup', () => {
+    keys.space = false;
+});
+jumpButton.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keys.space = true;
+});
+jumpButton.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    keys.space = false;
+});
 
 let canJump = true; // Variável para controlar se o player pode pular
 
@@ -214,10 +157,30 @@ function jump() {
     }
 }
 
-
 // Adiciona um evento de atualização para verificar colisão com o solo
 Matter.Events.on(engine, 'afterUpdate', function() {
     checkGroundCollision();
+});
+
+// Add keyboard event listeners
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'ArrowLeft') {
+        keys.left = true;
+    } else if (event.code === 'ArrowRight') {
+        keys.right = true;
+    } else if (event.code === 'Space') {
+        keys.space = true;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (event.code === 'ArrowLeft') {
+        keys.left = false;
+    } else if (event.code === 'ArrowRight') {
+        keys.right = false;
+    } else if (event.code === 'Space') {
+        keys.space = false;
+    }
 });
 
 // Game loop
@@ -235,15 +198,8 @@ function gameLoop() {
             Body.applyForce(player, player.position, { x: MOVE_FORCE, y: 0 });
         }
         if (keys.space) {
+            keys.space = false;  // Definindo que a tecla space foi liberada
             jump();
-        }
-
-        // Handle player movement from joystick
-        if (joystick.active) {
-            Body.applyForce(player, player.position, {
-                x: joystick.x * MOVE_FORCE,
-                y: 0
-            });
         }
         
         // Limit horizontal velocity

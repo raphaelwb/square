@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rolling Ball Game</title>
+    <title>Rolling Circle</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
@@ -211,8 +211,8 @@
     </style>
 </head>
 <body>
-    <div id="version">beta 0.0.2</div>
-    <h1 id="game-title">Circle</h1>
+    <div id="version">beta 0.0.3</div>
+    <h1 id="game-title">Rolling Circle</h1>
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
         <div id="multiplayer-controls">
@@ -231,8 +231,10 @@
         </div>
         <div id="game-logs"></div>
     </div>
-    <div id="joystick-area">
-        <div id="joystick"></div>
+    <div id="button-controls">
+        <button id="left-button">Left (&larr;)</button>
+        <button id="jump-button">Jump (Space)</button>
+        <button id="right-button">Right (&rarr;)</button>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
