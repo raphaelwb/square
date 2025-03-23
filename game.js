@@ -21,7 +21,7 @@ engine.gravity.y = 1;
 const PLAYER_RADIUS = 20;
 const player = Bodies.circle(
     canvas.width / 4,  // x position
-    canvas.height / 2, // y position
+    canvas.height / 4, // y position
     PLAYER_RADIUS,     // radius
     {
         density: 0.001,    // Makes the ball lighter
@@ -34,13 +34,15 @@ const player = Bodies.circle(
     }
 );
 
+ground = Bodies.rectangle(canvas.width / 2, canvas.height - 10, canvas.width, 20, { 
+    isStatic: true,
+    friction: 0.5
+})
+
 // Create ground and platforms
 const platforms = [
     // Ground
-    Bodies.rectangle(canvas.width / 2, canvas.height - 10, canvas.width, 20, { 
-        isStatic: true,
-        friction: 0.5
-    }),
+    ground,
     // Left wall
     Bodies.rectangle(10, canvas.height / 2, 20, canvas.height, { 
         isStatic: true,
@@ -48,6 +50,11 @@ const platforms = [
     }),
     // Right wall
     Bodies.rectangle(canvas.width - 10, canvas.height / 2, 20, canvas.height, { 
+        isStatic: true,
+        friction: 0.5
+    }),
+    // Top wall
+    Bodies.rectangle(canvas.width / 2, 10, canvas.width, 20, { 
         isStatic: true,
         friction: 0.5
     }),
@@ -159,6 +166,9 @@ document.addEventListener('keydown', (e) => {
             case 'd':
                 keys.right = true;
                 break;
+            case ' ':
+                keys.space = true;  // Definindo que a tecla space foi pressionada
+                break;
         }
     }
 });
@@ -174,8 +184,40 @@ document.addEventListener('keyup', (e) => {
             case 'd':
                 keys.right = false;
                 break;
+            case ' ':
+                keys.space = false;  // Definindo que a tecla space foi liberada
+                break;
         }
     }
+});
+
+
+// ... existing code ...
+
+let canJump = true; // Variável para controlar se o player pode pular
+
+// Função para verificar colisão com o solo
+function checkGroundCollision() {
+    // Verifica se o player está colidindo com o solo
+    const collisions = Matter.Query.collides(player, [ground]);
+    if (collisions.length > 0) {
+        canJump = true; // Permite o pulo se o player estiver tocando o solo
+    }
+}
+
+// Adiciona uma função de pulo ao player
+function jump() {
+    if (canJump) {
+        // Aplica uma força vertical para cima
+        Body.applyForce(player, player.position, { x: 0, y: -0.02 });
+        canJump = false; // Impede que o player pule novamente até tocar o solo
+    }
+}
+
+
+// Adiciona um evento de atualização para verificar colisão com o solo
+Matter.Events.on(engine, 'afterUpdate', function() {
+    checkGroundCollision();
 });
 
 // Game loop
@@ -191,6 +233,9 @@ function gameLoop() {
         }
         if (keys.right) {
             Body.applyForce(player, player.position, { x: MOVE_FORCE, y: 0 });
+        }
+        if (keys.space) {
+            jump();
         }
 
         // Handle player movement from joystick
