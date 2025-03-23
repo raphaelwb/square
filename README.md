@@ -30,7 +30,7 @@ error is in the function that controls the player.
 - 🎯 Add a target platform to complete the game.
 - 🚧 Allow the Interventor to add challenges.
 - ⚠️ Add jump control to joystick.
-- ⚠️ fix - Jump só funciona uma vez em modo multiplayer.
+- ⚠️ fix - Jump only works once in multiplayer mode.
 
 ## 🚀 Getting Started
 
