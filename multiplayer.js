@@ -9,17 +9,34 @@ const createRoomBtn = document.getElementById('createRoom');
 const joinRoomBtn = document.getElementById('joinRoom');
 const peerIdInput = document.getElementById('peerId');
 const roomIdDisplay = document.getElementById('roomId');
-const statusDisplay = document.getElementById('status');
 const gameLogsDiv = document.getElementById('game-logs');
 const shareWhatsAppBtn = document.getElementById('shareWhatsApp');
 
 // Share room code via WhatsApp
 function shareViaWhatsApp(roomId) {
     const gameUrl = window.location.href.split('?')[0]; // Get base URL without parameters
-    const message = `Come play with me! Use room code: ${roomId}\n\nAccess: ${gameUrl}`;
+    const message = `Come play with me! Click the link to join my room:\n\n${gameUrl}?room=${roomId}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
+
+// Check for room code in URL parameters
+function checkUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomCode = urlParams.get('room');
+    
+    if (roomCode) {
+        // Auto-fill the room code input
+        peerIdInput.value = roomCode;
+        // Auto-join the room after a short delay to ensure everything is loaded
+        setTimeout(() => {
+            joinRoom();
+        }, 1000);
+    }
+}
+
+// Initialize with URL parameter check
+window.addEventListener('load', checkUrlParameters);
 
 // Prevent double-tap zoom on buttons
 function preventZoom(e) {
@@ -62,13 +79,13 @@ function createRoom() {
     
     peer = new Peer();
     peer.on('open', (id) => {
-        roomIdDisplay.textContent = `Room Code: ${id}`;
-        statusDisplay.textContent = 'Waiting for Player...';
         isHost = true;
         window.isHost = true;
         gameStarted = true;
         window.gameStarted = true;
-        addLog(`Room created with ID: ${id}`, 'host');
+        addLog(`Your room code is: ${id}`, 'host');
+        addLog('Share this code with the player', 'system');
+        addLog('Waiting for player...', 'system');
         
         // Show share button and setup click handler
         shareWhatsAppBtn.style.display = 'flex';
@@ -81,14 +98,12 @@ function createRoom() {
     peer.on('connection', (conn) => {
         connection = conn;
         window.connection = conn;
-        statusDisplay.textContent = 'Player connected!';
-        addLog('Player connected to room', 'host');
+        addLog('Player connected!', 'host');
         setupConnection(conn);
     });
 
     peer.on('error', (err) => {
         console.error('[Host] Connection error:', err);
-        statusDisplay.textContent = 'Error creating room. Please try again.';
         addLog(`Error creating room: ${err.message}`, 'system');
         
         // Re-enable buttons on error
@@ -100,11 +115,16 @@ function createRoom() {
 
 // Join an existing room
 function joinRoom() {
-    const hostId = peerIdInput.value;
+    const hostId = peerIdInput.value.trim();
     if (!hostId) {
-        statusDisplay.textContent = 'Enter a valid room code!';
         addLog('Room code not provided', 'system');
         return;
+    }
+
+    // Clear room code from URL if it exists
+    if (window.history.replaceState) {
+        const newUrl = window.location.href.split('?')[0];
+        window.history.replaceState({}, document.title, newUrl);
     }
 
     // Disable buttons temporarily
@@ -118,7 +138,7 @@ function joinRoom() {
     peer.on('open', () => {
         connection = peer.connect(hostId);
         window.connection = connection;
-        statusDisplay.textContent = 'Connecting...';
+        addLog('Connecting...', 'system');
         addLog(`Trying to connect to room: ${hostId}`, 'interventor');
         isHost = false;
         window.isHost = false;
@@ -129,7 +149,6 @@ function joinRoom() {
 
     peer.on('error', (err) => {
         console.error('[Player] Connection error:', err);
-        statusDisplay.textContent = 'Connection error. Check the code and try again.';
         addLog(`Connection error: ${err.message}`, 'system');
         
         // Re-enable buttons on error
@@ -142,11 +161,9 @@ function joinRoom() {
 function setupConnection(conn) {
     conn.on('open', () => {
         if (isHost) {
-            statusDisplay.textContent = 'Player connected!';
             addLog('Connection established with player', 'host');
         } else {
-            statusDisplay.textContent = 'Connected to game!';
-            addLog('Connection established with host', 'interventor');
+            addLog('Connected to game!', 'interventor');
         }
     });
 
@@ -189,21 +206,18 @@ function setupConnection(conn) {
     });
 
     conn.on('close', () => {
-        statusDisplay.textContent = 'Connection lost!';
         addLog(isHost ? 'Player disconnected' : 'Connection with host lost', 'system');
         resetGame();
     });
 
     conn.on('error', (err) => {
         console.error(isHost ? '[Host]' : '[Player]', 'Connection error:', err);
-        statusDisplay.textContent = 'Connection error. Please try again.';
         addLog(`Connection error: ${err.message}`, 'system');
     });
 }
 
 // Reset multiplayer state
 function resetMultiplayer() {
-    statusDisplay.textContent = '';
     gameStarted = false;
     window.gameStarted = false;
     
@@ -218,7 +232,6 @@ function resetMultiplayer() {
     }
     isHost = false;
     window.isHost = false;
-    addLog('Multiplayer state reset', 'system');
 }
 
 // Event Listeners

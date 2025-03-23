@@ -19,6 +19,17 @@
             width: 800px;
             height: 600px;
         }
+        #version {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 1000;
+        }
         #joystick-area {
             position: fixed;
             bottom: 20px;
@@ -49,6 +60,16 @@
             border-radius: 10px;
             text-align: center;
             touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        #multiplayer-controls > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         #game-logs {
             width: 800px;
@@ -104,10 +125,6 @@
             min-height: 44px;
             font-size: 16px;
         }
-        #status {
-            margin-top: 10px;
-            font-weight: bold;
-        }
         .share-button {
             background-color: #25D366 !important; /* WhatsApp green */
             display: none;
@@ -126,21 +143,11 @@
             vertical-align: middle;
         }
 
-        .room-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        .share-container {
             margin: 10px 0;
-            flex-wrap: wrap;
-        }
-
-        #roomId {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin: 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
 
         @media (max-width: 800px) {
@@ -152,35 +159,37 @@
                 padding: 12px 24px;
             }
             input {
-                width: calc(100% - 30px);
+                width: 150px;
                 max-width: 300px;
             }
             #multiplayer-controls {
                 width: calc(100% - 40px);
-                max-width: 400px;
-            }
-            .room-info {
+                max-width: 800px;
                 flex-direction: column;
+                gap: 10px;
+            }
+            #multiplayer-controls > div {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
+    <div id="version">beta 0.0.1</div>
     <canvas id="gameCanvas"></canvas>
     <div id="multiplayer-controls">
         <button id="createRoom" role="button">Create Room</button>
-        <div>
+        <div class="join-controls">
             <input type="text" id="peerId" placeholder="Enter room code">
             <button id="joinRoom" role="button">Join Room</button>
         </div>
-        <div class="room-info">
-            <div id="roomId"></div>
-            <button id="shareWhatsApp" class="share-button" role="button">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTEuNWE4LjM4IDguMzggMCAwIDEtLjkgMy44IDguNSA4LjUgMCAwIDEtNy42IDQuNyA4LjM4IDguMzggMCAwIDEtMy44LS45TDMgMjFsMS45LTUuN2E4LjM4IDguMzggMCAwIDEtLjktMy44IDguNSA4LjUgMCAwIDEgNC43LTcuNiA4LjM4IDguMzggMCAwIDEgMy44LS45aC41YTguNDggOC40OCAwIDAgMSA4IDh2LjV6Ij48L3BhdGg+PC9zdmc+" alt="WhatsApp">
-                Share on WhatsApp
-            </button>
-        </div>
-        <div id="status"></div>
+    </div>
+    <div class="share-container">
+        <button id="shareWhatsApp" class="share-button" role="button">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTEuNWE4LjM4IDguMzggMCAwIDEtLjkgMy44IDguNSA4LjUgMCAwIDEtNy42IDQuNyA4LjM4IDguMzggMCAwIDEtMy44LS45TDMgMjFsMS45LTUuN2E4LjM4IDguMzggMCAwIDEtLjktMy44IDguNSA4LjUgMCAwIDEgNC43LTcuNiA4LjM4IDguMzggMCAwIDEgMy44LS45aC41YTguNDggOC40OCAwIDAgMSA4IDh2LjV6Ij48L3BhdGg+PC9zdmc+" alt="WhatsApp">
+            Send room code to player
+        </button>
     </div>
     <div id="game-logs"></div>
     <div id="joystick-area">

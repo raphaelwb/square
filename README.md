@@ -1,4 +1,4 @@
-# Square
+# Circle
 
 Circle is a platform game based on the concept of **Vibe Coding**.
 
@@ -9,15 +9,16 @@ Circle is a platform game based on the concept of **Vibe Coding**.
 ## 📝 Tasks
 
 ### ✅ Completed
-- 🏗️ Game environment is built based on a `level.txt` file.
-- ⬆️ Controller can jump using the space key.
+- ⚠️ Circle can be controlled.
 - 🏠 Game rooms can be created.
 - 👀 The Interventor can follow the game's progress.
+- It works on mobile, but the browser must be set to desktop mode.
 
 ### 🔧 To Do
-- ⚠️ The platform is appearing in the middle of the environment.
+- 🏗️ Game environment should be based on a `level.txt` file.
+- ⬆️ Controller can jump using the space key.
 - 🎯 Add a target platform to complete the game.
-- 🚧 Allow the Interventor to add challenges.
+- 🚧 Allow the Interventor to add challenges
 
 ## 🚀 Getting Started
 
@@ -32,6 +33,8 @@ To run the game locally:
 2. Translated texts to English.
 3. Improved the score display.
 4. Added barriers.
+
+## Development History
 
 ### First Version
 - The game featured a square that could jump and move sideways.
