@@ -11,6 +11,7 @@
             flex-direction: column;
             align-items: center;
             background-color: #333;
+            color: white;
         }
         canvas {
             background-color: #87CEEB;
@@ -28,6 +29,7 @@
             border-radius: 50%;
             touch-action: none;
             cursor: pointer;
+            z-index: 1000;
         }
         #joystick {
             position: absolute;
@@ -38,23 +40,155 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            touch-action: none;
             pointer-events: none;
         }
+        #multiplayer-controls {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            touch-action: manipulation;
+        }
+        #game-logs {
+            width: 800px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            margin-top: 20px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .log-entry.host {
+            color: #4CAF50;
+        }
+        .log-entry.interventor {
+            color: #2196F3;
+        }
+        .log-entry.system {
+            color: #FFC107;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-width: 120px;
+            min-height: 44px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: #3d8b40;
+            transform: scale(0.98);
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            min-height: 44px;
+            font-size: 16px;
+        }
+        #status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .share-button {
+            background-color: #25D366 !important; /* WhatsApp green */
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .share-button:hover {
+            background-color: #1da856 !important;
+        }
+        
+        .share-button img {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        #roomId {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 0;
+        }
+
         @media (max-width: 800px) {
-            canvas {
+            canvas, #game-logs {
                 width: 100%;
-                height: auto;
+            }
+            button {
+                font-size: 16px;
+                padding: 12px 24px;
+            }
+            input {
+                width: calc(100% - 30px);
+                max-width: 300px;
+            }
+            #multiplayer-controls {
+                width: calc(100% - 40px);
+                max-width: 400px;
+            }
+            .room-info {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <div id="multiplayer-controls">
+        <button id="createRoom" role="button">Criar Sala</button>
+        <div>
+            <input type="text" id="peerId" placeholder="Digite o código da sala">
+            <button id="joinRoom" role="button">Entrar na Sala</button>
+        </div>
+        <div class="room-info">
+            <div id="roomId"></div>
+            <button id="shareWhatsApp" class="share-button" role="button">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTEuNWE4LjM4IDguMzggMCAwIDEtLjkgMy44IDguNSA4LjUgMCAwIDEtNy42IDQuNyA4LjM4IDguMzggMCAwIDEtMy44LS45TDMgMjFsMS45LTUuN2E4LjM4IDguMzggMCAwIDEtLjktMy44IDguNSA4LjUgMCAwIDEgNC43LTcuNiA4LjM4IDguMzggMCAwIDEgMy44LS45aC41YTguNDggOC40OCAwIDAgMSA4IDh2LjV6Ij48L3BhdGg+PC9zdmc+" alt="WhatsApp">
+                Compartilhar no WhatsApp
+            </button>
+        </div>
+        <div id="status"></div>
+    </div>
+    <div id="game-logs"></div>
     <div id="joystick-area">
         <div id="joystick"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="multiplayer.js"></script>
     <script src="game.js"></script>
 </body>
 </html> 

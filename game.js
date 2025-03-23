@@ -97,27 +97,33 @@ const maxJoystickDistance = joystickBounds.width / 2 - joystickElement.offsetWid
 
 // Handle input events (both touch and mouse)
 function handleStart(e) {
-    e.preventDefault();
-    const point = e.touches ? e.touches[0] : e;
-    if (point.target === joystickArea || point.target === joystickElement) {
-        joystick.active = true;
-        updateJoystickPosition(point);
+    if (!window.gameStarted || window.isHost) {
+        e.preventDefault();
+        const point = e.touches ? e.touches[0] : e;
+        if (point.target === joystickArea || point.target === joystickElement) {
+            joystick.active = true;
+            updateJoystickPosition(point);
+        }
     }
 }
 
 function handleMove(e) {
-    e.preventDefault();
-    if (joystick.active) {
-        const point = e.touches ? e.touches[0] : e;
-        updateJoystickPosition(point);
+    if (!window.gameStarted || window.isHost) {
+        e.preventDefault();
+        if (joystick.active) {
+            const point = e.touches ? e.touches[0] : e;
+            updateJoystickPosition(point);
+        }
     }
 }
 
 function handleEnd(e) {
-    e.preventDefault();
-    joystick.active = false;
-    joystickElement.style.transform = 'translate(-50%, -50%)';
-    joystick.x = 0;
+    if (!window.gameStarted || window.isHost) {
+        e.preventDefault();
+        joystick.active = false;
+        joystickElement.style.transform = 'translate(-50%, -50%)';
+        joystick.x = 0;
+    }
 }
 
 function updateJoystickPosition(point) {
@@ -141,30 +147,34 @@ joystickArea.addEventListener('mousedown', handleStart);
 document.addEventListener('mousemove', handleMove);
 document.addEventListener('mouseup', handleEnd);
 
-// Keyboard event listeners
+// Keyboard event listeners - Only allow input if host or game not started
 document.addEventListener('keydown', (e) => {
-    switch(e.key) {
-        case 'ArrowLeft':
-        case 'a':
-            keys.left = true;
-            break;
-        case 'ArrowRight':
-        case 'd':
-            keys.right = true;
-            break;
+    if (!window.gameStarted || window.isHost) {
+        switch(e.key) {
+            case 'ArrowLeft':
+            case 'a':
+                keys.left = true;
+                break;
+            case 'ArrowRight':
+            case 'd':
+                keys.right = true;
+                break;
+        }
     }
 });
 
 document.addEventListener('keyup', (e) => {
-    switch(e.key) {
-        case 'ArrowLeft':
-        case 'a':
-            keys.left = false;
-            break;
-        case 'ArrowRight':
-        case 'd':
-            keys.right = false;
-            break;
+    if (!window.gameStarted || window.isHost) {
+        switch(e.key) {
+            case 'ArrowLeft':
+            case 'a':
+                keys.left = false;
+                break;
+            case 'ArrowRight':
+            case 'd':
+                keys.right = false;
+                break;
+        }
     }
 });
 
@@ -173,28 +183,31 @@ function gameLoop() {
     // Update physics
     Engine.update(engine, 1000 / 60);
     
-    // Handle player movement from keyboard
-    if (keys.left) {
-        Body.applyForce(player, player.position, { x: -MOVE_FORCE, y: 0 });
-    }
-    if (keys.right) {
-        Body.applyForce(player, player.position, { x: MOVE_FORCE, y: 0 });
-    }
+    // Only allow host to control the player
+    if (!window.gameStarted || window.isHost) {
+        // Handle player movement from keyboard
+        if (keys.left) {
+            Body.applyForce(player, player.position, { x: -MOVE_FORCE, y: 0 });
+        }
+        if (keys.right) {
+            Body.applyForce(player, player.position, { x: MOVE_FORCE, y: 0 });
+        }
 
-    // Handle player movement from joystick
-    if (joystick.active) {
-        Body.applyForce(player, player.position, {
-            x: joystick.x * MOVE_FORCE,
-            y: 0
-        });
-    }
-    
-    // Limit horizontal velocity
-    if (Math.abs(player.velocity.x) > MAX_VELOCITY) {
-        Body.setVelocity(player, {
-            x: Math.sign(player.velocity.x) * MAX_VELOCITY,
-            y: player.velocity.y
-        });
+        // Handle player movement from joystick
+        if (joystick.active) {
+            Body.applyForce(player, player.position, {
+                x: joystick.x * MOVE_FORCE,
+                y: 0
+            });
+        }
+        
+        // Limit horizontal velocity
+        if (Math.abs(player.velocity.x) > MAX_VELOCITY) {
+            Body.setVelocity(player, {
+                x: Math.sign(player.velocity.x) * MAX_VELOCITY,
+                y: player.velocity.y
+            });
+        }
     }
     
     // Clear canvas
@@ -229,9 +242,34 @@ function gameLoop() {
         player.position.y + Math.sin(player.angle) * PLAYER_RADIUS
     );
     ctx.stroke();
+
+    // Send game state to connected peer if we are the host
+    if (window.isHost && window.connection && window.gameStarted) {
+        window.connection.send({
+            type: 'gameState',
+            player: {
+                x: player.position.x,
+                y: player.position.y,
+                velocityX: player.velocity.x,
+                velocityY: player.velocity.y,
+                angle: player.angle
+            },
+            platforms: platforms.map(p => ({
+                x: p.position.x,
+                y: p.position.y,
+                width: p.bounds.max.x - p.bounds.min.x,
+                height: p.bounds.max.y - p.bounds.min.y
+            }))
+        });
+    }
     
     requestAnimationFrame(gameLoop);
 }
+
+// Make game objects available to multiplayer.js
+window.player = player;
+window.platforms = platforms;
+window.keys = keys;
 
 // Start the game
 gameLoop(); 
