@@ -25,9 +25,10 @@ error is in the function that controls the player.
 - 👀 The Interventor can follow the game's progress.
 - It works on mobile, but the browser must be set to desktop mode.
 - Removed joistick and included control buttons
+- 🏗️ Game environment is now be based on a `level?.txt` file.
 
 ### 🔧 To Do
-- 🏗️ Game environment should be based on a `level?.txt` file.
+- The representation of \ and / in the level file should be improved.
 - 🎯 Add a target platform to complete the game.
 - 🚧 Allow the Interventor to add challenges.
 

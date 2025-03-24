@@ -211,10 +211,13 @@
     </style>
 </head>
 <body>
-    <div id="version">beta 0.0.3</div>
+    <div id="version">beta 0.0.4</div>
     <h1 id="game-title">Rolling Circle</h1>
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
+        <div id="victory-message" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px; font-size: 24px; text-align: center;">
+            Level Complete!
+        </div>
         <div id="multiplayer-controls">
             <button id="createRoom" role="button">Create Room</button>
             <div class="join-controls">

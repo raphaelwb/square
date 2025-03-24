@@ -58,19 +58,6 @@ const platforms = [
         isStatic: true,
         friction: 0.5
     }),
-    // Platforms
-    Bodies.rectangle(canvas.width * 0.7, canvas.height * 0.7, 200, 20, { 
-        isStatic: true,
-        friction: 0.5
-    }),
-    Bodies.rectangle(canvas.width * 0.3, canvas.height * 0.5, 200, 20, { 
-        isStatic: true,
-        friction: 0.5
-    }),
-    Bodies.rectangle(canvas.width * 0.8, canvas.height * 0.3, 200, 20, { 
-        isStatic: true,
-        friction: 0.5
-    })
 ];
 
 // Add all bodies to the world
@@ -139,12 +126,15 @@ jumpButton.addEventListener('touchend', (e) => {
 
 let canJump = true; // Variável para controlar se o player pode pular
 
-// Função para verificar colisão com o solo
-function checkGroundCollision() {
-    // Verifica se o player está colidindo com o solo
-    const collisions = Matter.Query.collides(player, [ground]);
+// Função para verificar colisão com plataformas do tipo '_'
+function checkPlatformCollision() {
+    // Filtra as plataformas do tipo '_'
+    const flatPlatforms = platforms.filter(platform => platform.vertices.length === 4);
+    
+    // Verifica se o player está colidindo com alguma plataforma do tipo '_'
+    const collisions = Matter.Query.collides(player, flatPlatforms);
     if (collisions.length > 0) {
-        canJump = true; // Permite o pulo se o player estiver tocando o solo
+        canJump = true; // Permite o pulo se o player estiver tocando uma plataforma do tipo '_'
     }
 }
 
@@ -153,13 +143,13 @@ function jump() {
     if (canJump) {
         // Aplica uma força vertical para cima
         Body.applyForce(player, player.position, { x: 0, y: -0.02 });
-        canJump = false; // Impede que o player pule novamente até tocar o solo
+        canJump = false; // Impede que o player pule novamente até tocar uma plataforma do tipo '_'
     }
 }
 
-// Adiciona um evento de atualização para verificar colisão com o solo
+// Adiciona um evento de atualização para verificar colisão com plataformas do tipo '_'
 Matter.Events.on(engine, 'afterUpdate', function() {
-    checkGroundCollision();
+    checkPlatformCollision();
 });
 
 // Add keyboard event listeners
@@ -182,6 +172,148 @@ document.addEventListener('keyup', (event) => {
         keys.space = false;
     }
 });
+
+// Read level data from level.txt
+fetch('level.txt')
+    .then(response => response.text())
+    .then(levelData => {
+        const level = levelData.trim().split('\n').map(row => row.trim().split(''));
+        
+        // Find player start position
+        let startX, startY;
+        for (let y = 0; y < level.length; y++) {
+            for (let x = 0; x < level[y].length; x++) {
+                if (level[y][x] === '@') {
+                    startX = x;
+                    startY = y;
+                    break;
+                }
+            }
+            if (startX !== undefined) break;
+        }
+        
+        // Set player starting position
+        if (startX !== undefined && startY !== undefined) {
+            Matter.Body.setPosition(player, {
+                x: (startX + 0.5) * (canvas.width / level[0].length),
+                y: (startY + 0.5) * (canvas.height / level.length)
+            });
+        } else {
+            // Fallback to default starting position if '#' is not found in level.txt
+            Matter.Body.setPosition(player, {
+                x: canvas.width / 4,
+                y: canvas.height / 4
+            });
+        }
+        
+        // Create platforms and obstacles based on level data
+        const platformChars = ['|', '_', '\\', '/'];
+        const platformHeight = (canvas.height / level.length) * 0.5;
+        for (let y = 0; y < level.length; y++) {
+            for (let x = 0; x < level[y].length; x++) {
+                const char = level[y][x];
+                if (platformChars.includes(char)) {
+                    let height = platformHeight;
+                    let yPos = (y + 0.5) * (canvas.height / level.length);
+                    if (char === '|') {
+                        height *= 3;  // Triplicar a altura para |
+                        yPos = (y + 1) * (canvas.height / level.length) - height / 2 - (canvas.height / level.length) * 0.25;  // Posicionar 25% para cima
+                        platforms.push(
+                            Bodies.rectangle(
+                                (x + 0.5) * (canvas.width / level[0].length),
+                                yPos,
+                                canvas.width / level[0].length,
+                                height,
+                                {
+                                    isStatic: true,
+                                    friction: 0.5
+                                }
+                            )
+                        );
+                    } else if (char === '\\') {
+                        height *= 3;  // Triplicar a altura para \
+                        yPos = (y + 1) * (canvas.height / level.length) - height / 2 - (canvas.height / level.length) * 0.25;  // Posicionar 25% para cima
+                        platforms.push(
+                            Bodies.rectangle(
+                                (x + 0.5) * (canvas.width / level[0].length),
+                                yPos,
+                                canvas.width / level[0].length,
+                                height,
+                                {
+                                    isStatic: true,
+                                    friction: 0.5,
+                                    angle: -Math.PI / 4  // Rotacionar 45 graus no sentido horário
+                                }
+                            )
+                        );
+                    } else if (char === '/') {
+                        height *= 3;  // Triplicar a altura para /
+                        yPos = (y + 1) * (canvas.height / level.length) - height / 2 - (canvas.height / level.length) * 0.25;  // Posicionar 25% para cima
+                        platforms.push(
+                            Bodies.rectangle(
+                                (x + 0.5) * (canvas.width / level[0].length),
+                                yPos,
+                                canvas.width / level[0].length,
+                                height,
+                                {
+                                    isStatic: true,
+                                    friction: 0.5,
+                                    angle: Math.PI / 4  // Rotacionar 45 graus no sentido anti-horário
+                                }
+                            )
+                        );
+                    } else {
+                        platforms.push(
+                            Bodies.rectangle(
+                                (x + 0.5) * (canvas.width / level[0].length),
+                                yPos,
+                                canvas.width / level[0].length,
+                                height,
+                                {
+                                    isStatic: true,
+                                    friction: 0.5
+                                }
+                            )
+                        );
+                    }
+                } else if (char === '$') {
+                    // Create goal platform
+                    platforms.push(
+                        Bodies.rectangle(
+                            (x + 0.5) * (canvas.width / level[0].length),
+                            (y + 0.5) * (canvas.height / level.length),
+                            canvas.width / level[0].length,
+                            platformHeight,
+                            {
+                                isStatic: true,
+                                friction: 0.5,
+                                render: {
+                                    fillStyle: 'gold'
+                                }
+                            }
+                        )
+                    );
+                }
+            }
+        }
+        
+        // Add all platforms to the world
+        World.add(engine.world, platforms);
+
+        // Start the game
+        gameLoop();
+    })
+    .catch(error => {
+        console.error('Error reading level.txt:', error);
+        
+        // Fallback to default starting position if there's an error reading level.txt
+        Matter.Body.setPosition(player, {
+            x: canvas.width / 4,
+            y: canvas.height / 4
+        });
+        
+        // ... rest of the code ...
+    });
 
 // Game loop
 function gameLoop() {
@@ -244,6 +376,7 @@ function gameLoop() {
     );
     ctx.stroke();
 
+    
     // Send game state to connected peer if we are the host
     if (window.isHost && window.connection && window.gameStarted) {
         window.connection.send({
@@ -272,5 +405,10 @@ window.player = player;
 window.platforms = platforms;
 window.keys = keys;
 
-// Start the game
-gameLoop(); 
+function showVictoryMessage() {
+    const victoryMessage = document.getElementById('victory-message');
+    victoryMessage.style.display = 'block';
+    setTimeout(() => {
+        victoryMessage.style.display = 'none';
+    }, 3000);
+} 
